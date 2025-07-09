@@ -1,3 +1,9 @@
+学习注意：
+1. 学习一个函数要看输入参数类型，所属的类，返回的类型，返回的维度；
+
+
+
+
 ### Used Code
 #### os module
 1. `os.path.dirname(path)`: 返回获取指定路径中目录部分的路径
@@ -35,12 +41,62 @@
 1. `random.sample(population, k)`: 从population中随机抽取k个元素，返回一个列表；
 可以用于数据集的随机抽样；
 
+#### datetime
+1. `datetime.datetime.now()`: 获取当前日期和时间
+
+#### json模块
+
+#### 正则表达式
+##### 捕获组
+
 #### python
+##### 万物皆对象
+python中实例与对象是一样的；
+- 类也是对象
+```python
+>>> isinstance(object, type)
+True               # object 是 type 的实例
+
+>>> isinstance(type, object)
+True               # type 是 object 的实例
+
+>>> issubclass(type, object)
+True               # type 是 object 的子类
+
+>>> issubclass(object, type)
+False              # object 不是 type 的子类
+```
+object是类但也是type的对象；
+type是object的子类，同时也是object的对象；
+
+
+
+##### 基本用法
+###### 基本数据类型：
+1. 数值类型(Numeric Types)：
+   - int：整数，如42
+   - float：浮点数，如3.14
+   - complex：复数，如3+4j
+   - bool：布尔值，True或False
+2. 序列类型(Sequence Types)：
+   - str：字符串，如"hello"
+   - list：列表，如[1, 2, 3]
+   - tuple：元组，如(1, 2, 3)
+   - range：范围，如range(5)
+3. 映射类型(Mapping Type)：
+   - dict：字典，如{'a': 1, 'b': 2}
+4. 集合类型(Set Types)：
+   - set：可变集合，如{1, 2, 3}
+   - frozenset：不可变集合
+5. 二进制类型(Binary Types)：
+   - bytes：不可变字节序列，如b'hello'
+   - bytearray：可变字节序列
+   - memoryview：内存视图
 ###### 标准容器：`list`, `tuple`, `dict`, `set`
  - `list`: 可变，有序，元素可重复
  - `tuple`: 不可变，有序，元素可重复
  - `dict`: key-value对，key不可重复
- - `set`: 不可重复，无序
+ - `set`: 可变 不可重复，无序
 ###### `list` 方法：
   - `append(x)`: 将元素 x 添加到列表的末尾
   - `extend(iterable)`: 将可迭代对象的元素添加到列表的末尾
@@ -91,7 +147,147 @@
       - `reverse`: 一个布尔值。如果为 True，则按降序排序；如果为 False（默认值），则按升序排序
 ###### `list()`, `dict()`
 ###### `",".join()`: 连成字符串
-###### 函数变量
+###### 类方法，静态方法和实例方法：
+- 类方法的应用：
+  1. 替代构造函数
+     - from_string() 方法提供了一种从字符串创建对象的替代方式，而不仅仅局限于标准的 __init__
+
+  2. 访问和修改类变量
+     - get_count() 方法访问类变量 employee_count，展示了类方法可以直接操作类级别的数据
+
+  3. 批量创建实例
+     - create_interns() 方法展示了如何使用类方法批量创建类的实例
+
+  4. 支持继承
+     - 所有这些类方法都使用 cls 而不是硬编码的类名，这样子类可以继承这些方法并且正确工作
+```python
+class Employee:
+    # 类变量，跟踪所有员工数量
+    employee_count = 0
+    
+    def __init__(self, name, salary):
+        self.name = name
+        self.salary = salary
+        # 增加员工计数
+        Employee.employee_count += 1
+    
+    def display_info(self):
+        return f"姓名: {self.name}, 薪资: {self.salary}"
+    
+    @classmethod
+    def from_string(cls, emp_string):
+        """从格式化字符串创建员工对象"""
+        name, salary = emp_string.split('-')
+        return cls(name, float(salary))
+    
+    @classmethod
+    def get_count(cls):
+        """获取当前员工总数"""
+        return cls.employee_count
+    
+    @classmethod
+    def create_interns(cls, names):
+        """批量创建实习生 - 固定薪资为2000"""
+        interns = []
+        for name in names:
+            interns.append(cls(name, 2000))
+        return interns
+
+# 正常创建员工
+emp1 = Employee("张三", 8000)
+emp2 = Employee("李四", 9000)
+
+# 使用类方法从字符串创建员工
+emp3 = Employee.from_string("王五-7500")
+
+# 获取员工总数
+print(f"当前员工总数: {Employee.get_count()}")  # 输出: 当前员工总数: 3
+
+# 批量创建实习生
+intern_names = ["小明", "小红", "小华"]
+interns = Employee.create_interns(intern_names)
+
+# 检查创建的实习生
+for intern in interns:
+    print(intern.display_info())
+
+# 再次获取员工总数
+print(f"添加实习生后员工总数: {Employee.get_count()}")  # 输出: 添加实习生后员工总数: 6
+```
+- 静态方法的应用：
+   用法：实现与类相关但不访问类的内部状态的功能；
+   特点：不接收特殊的第一个参数（不像实例方法接收 self 或类方法接收 cls）
+        不能访问或修改类属性或实例属性
+```python
+class MathHelper:
+    
+    @staticmethod
+    def is_prime(n):
+        """检查一个数是否是质数"""
+        if n <= 1:
+            return False
+        if n <= 3:
+            return True
+        if n % 2 == 0 or n % 3 == 0:
+            return False
+        i = 5
+        while i * i <= n:
+            if n % i == 0 or n % (i + 2) == 0:
+                return False
+            i += 6
+        return True
+    
+    @staticmethod
+    def factorial(n):
+        """计算阶乘"""
+        if n < 0:
+            raise ValueError("阶乘不能用于负数")
+        result = 1
+        for i in range(2, n + 1):
+            result *= i
+        return result
+    
+    @staticmethod
+    def celsius_to_fahrenheit(celsius):
+        """摄氏度转华氏度"""
+        return (celsius * 9/5) + 32
+    
+    @staticmethod
+    def validate_number(value):
+        """验证一个值是否为数字"""
+        try:
+            float(value)
+            return True
+        except (ValueError, TypeError):
+            return False
+
+# 直接通过类调用静态方法，无需创建实例
+print(f"7是质数吗？{MathHelper.is_prime(7)}")  # 输出: 7是质数吗？True
+print(f"8是质数吗？{MathHelper.is_prime(8)}")  # 输出: 8是质数吗？False
+
+# 计算阶乘
+print(f"5的阶乘是：{MathHelper.factorial(5)}")  # 输出: 5的阶乘是：120
+
+# 温度转换
+celsius = 25
+fahrenheit = MathHelper.celsius_to_fahrenheit(celsius)
+print(f"{celsius}°C = {fahrenheit}°F")  # 输出: 25°C = 77.0°F
+
+# 验证输入
+values = [10, "20", "abc", None, 3.14]
+for value in values:
+    if MathHelper.validate_number(value):
+        print(f"{value} 是一个有效的数字")
+    else:
+        print(f"{value} 不是一个有效的数字")
+```
+###### 函数变量的用法：
+1. 回调
+2. 高阶函数
+仅留个记录，具体作用会展开
+
+
+
 ###### 字典解析：
     ```python
     my_dict = {'a': 1, 'b': 2, 'c': 3}
@@ -111,7 +307,7 @@
     dicts = {"key": 123}
     test4(1, *lists, **dicts)
     ```
-###### 创建字典：
+###### 循环的创建字典：
     ```python
     dic_values = {'%g' % (line[0]): line[1:] for line in values}
     ```
@@ -235,9 +431,18 @@ map(function, iterable, ...)
   3. 当处理大量数据时，map() 的惰性计算特性可能更有优势
   4. 如果需要更复杂的转换逻辑，可能列表推导式更合适
 
-###### 可迭代对象，迭代器和生成器
+###### eval()函数：
+可以直接运行字符串：
+```python
+eval("1+1")
+```
+
+
+##### 高级一点的用法：
+###### 可迭代对象，迭代器
 1. 可迭代对象
 可迭代对象的核心是实现了 `__iter__()` 方法或 `__getitem__()` 方法。
+
 - 常用的可迭代对象有：
     - 列表（list）
     - 元组（tuple）
@@ -245,7 +450,9 @@ map(function, iterable, ...)
     - 字典（dict）
     - 集合（set）
     - range()
+
 - 使用`__iter__()`方法实现可迭代对象：
+**注意：** 要使用 __iter__()，需要在一个类中定义它，并且通常还需要定义 __next__() 方法或者让 __iter__() 返回一个实现了 __next__() 的对象来创建一个迭代器;
 ```python
 class MyIterable:
     def __init__(self, data):
@@ -253,6 +460,9 @@ class MyIterable:
     def __iter__(self):
         return iter(self.data)
 ```
+**注意这里返回的是其它类型的迭代器；**
+
+
 - 使用`__getitem__()`方法实现可迭代对象：
 ```python
 class GetItemExample:
@@ -270,10 +480,10 @@ print(getitem_obj[0])  # 输出: 1
 for item in getitem_obj:  # 也可以遍历
     print(item)  # 输出: 1, 2, 3
 ```
-区别：`__iter__`：需要配合 `__next__` 方法一起使用，实现完整的迭代器协议
+**区别：`__iter__`：需要配合 `__next__` 方法一起使用，实现完整的迭代器协议**
 `__getitem__`：只需要实现一个方法，通过索引访问元素。
 
-- 关于iter函数：
+- 关于iter()函数：不是类方法但也返回可迭代对象的迭代器；
 基本语法：`iter(object[, sentinel]) `
     - 关于sentinel(哨兵的意思):
 
@@ -287,16 +497,17 @@ def readline():
 iterator = iter(readline, 'quit')
 for line in iterator:
     print(f"You entered: {line}")
-
 ```
 
-    - 与for的关系：
+- 与for的关系：
     
 ```python
 # for 循环内部实际上是这样工作的：
 my_list = [1, 2, 3]
 
 # 这个 for 循环:
+
+
 for item in my_list:
     print(item)
 
@@ -309,7 +520,7 @@ while True:
     except StopIteration:
         break
 ```
-     - 一些应用场景
+    - 一些应用场景
 ```python
 # 1. 逐行读取文件
 with open('file.txt', 'r') as f:
@@ -332,16 +543,78 @@ counter = iter(count())  # 创建一个从0开始的无限计数器
 ```
 
 
-
-
 2. 迭代器
-迭代器是实现了 `__iter__()` 方法和 `__next__()` 方法的对象。
+迭代器是实现了 `__iter__()` 方法**和** `__next__()` 方法的对象。
 
-3. 生成器
-生成器是一种特殊的迭代器,使用 yield 关键字定义生成器函数,生成器函数执行时不会一次性生成所有值，而是在需要时才生成下一个值,这种"延迟计算"的特性使得生成器特别适合处理大量数据
+
+**`__iter()__`,`__next()__`和`__getitem()__`的区别：**
+`__getitem()__`：实现了`__getitem()__`方法的对象是可迭代对象，而不是迭代器。`__getitem()__`方法接受一个索引参数，返回对应位置的元素。`__getitem()__`方法可以通过索引访问元素，但不能实现惰性计算，也不能保存状态信息。
+- `__iter()__`：返回可迭代对象，next()返回迭代器；只实现`__next()__`的话不能for;
+
+```python
+print("=== 1. 基础迭代器例子 - 数字范围 ===")
+
+class NumberRange:
+    """生成指定范围内的数字"""
+    def __init__(self, start, end, step=1):
+        self.start = start
+        self.end = end
+        self.step = step
+        self.current = start
+    
+    def __iter__(self):
+        return self    ###========注意这里返回的是自身；
+    
+    def __next__(self):
+        if self.current >= self.end:
+            raise StopIteration
+        result = self.current
+        self.current += self.step
+        return result
+
+# 使用例子
+print("生成 1 到 5 的数字:")
+for num in NumberRange(1, 6):
+    print(f"  {num}")
+
+print("\n生成 0 到 10 的偶数:")
+for num in NumberRange(0, 11, 2):
+    print(f"  {num}")
+```
+
+**迭代器与可迭代对象区别：**
+1. 消耗性
+迭代器是消耗性的，一旦迭代完就不能重新迭代
+可迭代对象可以重复迭代，每次迭代都会创建新的迭代器
+2. 内存效率
+迭代器是惰性的，只在需要时才生成下一个值
+可迭代对象通常会在内存中保存所有元素
+3. 访问方式
+可迭代对象支持索引、切片等操作（如果实现了__getitem__）
+迭代器只能按顺序访问，不能回退或随机访问
+4. 使用场景：
+可迭代对象适合：需要多次遍历数据;需要随机访问元素;数据量较小，可以全部加载到内存
+迭代器适合：处理大量数据;生成无限序列;只需要遍历一次;需要节省内存
+
+- 判断是不是可迭代对象/可迭代
+```python
+from collections.abc import Iterable,Iterator
+isinstance(obj,Iterable) # 判断obj是否是可迭代对象
+isinstance(obj,Iterator) # 判断obj是否是迭代器
+``` 
+
+###### 生成器
+- 生成器是一种特殊的迭代器,使用 yield 关键字定义生成器函数,生成器函数执行时不会一次性生成所有值，而是在需要时才生成下一个值,这种"延迟计算"的特性使得生成器特别适合处理大量数据
+
+- 在 Python 里，“生成器（generator）”是一类 特殊的迭代器。它遵循迭代器协议——实现 __iter__() 并返回自身，以及 __next__()——但生成器 不是手写这两个方法，而是由：
+
+生成器函数：函数体里出现 yield 关键字
+
+生成器表达式：形如 (expr for x in iterable)
 
 ###### 装饰器
 装饰器(Decorator)是 Python 中一个非常重要的特性，它是一种用于修改或增强函数或类功能的设计模式。装饰器本质上是一个函数，它接受一个函数作为参数，并返回一个新的函数，从而在不修改原函数代码的情况下，为其添加新的功能。
+
 ```python
 def my_decorator(func):
     def wrapper():
@@ -356,6 +629,45 @@ def say_hello():
 
 # 调用函数
 say_hello()
+```
+相当于: 
+```python
+say_hello = my_decorator(say_hello)
+say_hello()
+```
+
+- 使用functools.wraps保留原函数信息：
+例子见notebook
+
+wraps函数复制了以下属性：
+```python
+WRAPPER_ASSIGNMENTS = ('__module__', '__name__', '__qualname__', '__annotations__', '__doc__')
+WRAPPER_UPDATES = ('__dict__',)
+```
+这些属性被赋值到 wrapper 上，使其看起来就像原始函数。
+
+
+
+
+###### 参数化装饰器
+参数化装饰器使用一个外层函数接受参数：
+```python
+def log(prefix):  # 外层函数，接受参数
+    def decorator(func):  # 真正的装饰器
+        def wrapper(*args, **kwargs):
+            print(f"{prefix} - Calling {func.__name__}")
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator  # 返回装饰器
+
+@log("INFO")
+def greet(name):
+    print(f"Hello, {name}!")
+```
+相当于：
+```python
+greet = log("INFO")(greet)
+greet("Alice")
 ```
 
 
@@ -393,6 +705,23 @@ say_hello()
    - `ZeroDivisionError`: 除零错误
    - `AttributeError`: 属性错误
    - `ImportError`: 导入错误
+
+3.1 ValueError
+```python
+def check_age(age):
+    if age < 0:
+        raise ValueError("Age cannot be negative")
+    if age > 150:
+        raise ValueError("Age is too high")
+    return age
+
+# 使用示例
+try:
+    check_age(-5)
+except ValueError as e:
+    print(f"Error: {e}")  # 输出: Error: Age cannot be negative
+```
+
 
 4. 自定义异常:
    ```python
@@ -519,12 +848,218 @@ result = n1 + n2  # 自动调用 __add__
 print(result)     # 自动调用 __str__
 ```
 `__new__()` 用于实例化一个对象；`__init__()` 用于初始化一个对象，`__new__()` 在 `__init__()` 之前被调用
+
+###### 回调：
+回调(Callback)是指将一个函数作为参数传递给另一个函数，并在特定事件发生或特定条件满足时被调用。这个被传递的函数就叫做回调函数。
+1. 例1：错误处理
+```python
+def process_data(data, success_callback, error_callback):
+    try:
+        result = data / 0  # 可能出错的操作
+        success_callback(result)  # 成功时的回调
+    except Exception as e:
+        error_callback(str(e))  # 错误时的回调
+
+# 定义回调函数
+def on_success(result):
+    print(f"操作成功，结果是: {result}")
+
+def on_error(error_msg):
+    print(f"操作失败，错误信息: {error_msg}")
+
+# 使用回调
+process_data(10, on_success, on_error)
+```
+
+2. 例2：事件处理中的回调
+```python
+#事件处理中的回调
+class EventSystem:
+
+    def __init__(self):
+        self.callbacks = {}
+    
+    def register(self, event_name, callback):
+        if event_name not in self.callbacks:
+            self.callbacks[event_name] = []
+        self.callbacks[event_name].append(callback)
+    
+    def trigger(self, event_name):
+        if event_name in self.callbacks:
+            for callback in self.callbacks[event_name]:
+                callback()
+
+def on_start():
+    print("Started!")
+
+def on_end():
+    print("Ended!")
+
+# 使用事件系统
+events = EventSystem()
+events.register('start', on_start)
+events.register('end', on_end)
+
+events.trigger('start')  # 输出: Started!
+events.trigger('end')    # 输出: Ended!
+
+```
+
+###### 函数工厂
+
+###### 函数式编程和命令式编程
+
+###### 高阶函数
+高阶函数是指至少满足以下一个条件的函数：
+- 接受一个或多个函数作为参数。
+- 返回一个函数作为结果。
+高阶函数的概念是函数式编程的核心之一，它允许函数像数据一样被传递和操作。
+
+###### 描述符
+允许自定义访问类属性时的行为：
+例1：
+```python
+class ValidString:
+    def __init__(self, minlen=0):
+        self.minlen = minlen
+        
+    def __get__(self, obj, owner=None):
+        return obj._name
+    
+    def __set__(self, obj, value):
+        if not isinstance(value, str):
+            raise TypeError('Expected a string')
+        if len(value) < self.minlen:
+            raise ValueError(f'String too short, min length is {self.minlen}')
+        obj._name = value
+
+class Person:
+    name = ValidString(minlen=3)  # 验证名字长度至少为3
+    
+    def __init__(self, name):
+        self.name = name
+
+# 使用
+p = Person("Bob")      # 报错：名字太短
+p = Person("Alice")    # 正确
+p.name = "Jo"         # 报错：名字太短
+p.name = 123          # 报错：不是字符串
+```
+
+- 注意描述符有obj参数。
+
+
+###### 模块中的CLI接口
+可以直接在命令行运行，避免写python脚本
+
+
+##### 一些小点：
+###### value[-1]和value[-1:]的区别：
+- value[-1]：返回最后一个元素
+- value[-1:]：返回最后一个元素的切片，返回的是一个包含最后一个元素的列表
+
+###### setattr()
+setattr(object, name, value)
+设置对象的属性值。
+The setattr() function is particularly useful when:
+- The attribute name is determined dynamically at runtime
+- You're working with attribute names that are stored in variables
+- You need to set attributes programmatically
+
+######  Nan,None,Inf的区别：
+- Nan (Not a Number)：
+  - 类型：浮点数的一种特殊值，属于float类型
+  - 来源：数学运算中的未定义结果，在NumPy/PyTorch中常见
+  - 特性：
+    - 与任何值比较都返回 False，包括与自身比较
+    - 参与的任何算术运算结果都是 NaN
+  - 产生：
+    - 0/0
+    - 0*inf
+    - inf-inf
+    - inf/inf
+    - inf*0
+
+- None：
+  - 类型：Python的内置单例对象，是NoneType类型的唯一实例
+  - 来源：Python语言的内置类型，不是计算结果
+  - 用途：表示变量没有值、缺失值或未初始化
+
+- Inf (Infinity)：
+  - 类型：浮点数的一种特殊值，属于float类型
+  - 表示无穷大
+
+
+
 #### numpy module
+numpy数组的特点是高维，同类型元素。
+
+##### ndarray 的组成：
+ndarray 内部由以下内容组成：
+
+- 一个指向数据（内存或内存映射文件中的一块数据）的指针。
+- 数据类型或 dtype，描述在数组中的固定大小值的格子。
+- 一个表示数组形状（shape）的元组，表示各维度大小的元组。
+- 一个跨度元组（stride），其中的整数指的是为了前进到当前维度下一个元素需要"跨过"的字节数。
+
+副本与拷贝的区别：
+副本（View）：
+- 共享底层数据
+- 不分配新内存
+- 原数组修改会影响副本
+- 副本修改也会影响原数组
+- 通常由切片、重塑等操作创建
+
+拷贝（Copy）：
+- 创建数据的完全独立副本
+- 分配新内存
+- 原数组修改不影响拷贝
+- 拷贝修改不影响原数组
+- 通过.copy()方法显式创建
+
+产生副本的操作：
+- 切片操作
+- 转置
+- 改变形状
+
+产生拷贝操作：
+- 使用.copy()方法
+
+##### numpy 数据类型 dtype
+1. 字节顺序的小端法与大端法：
+- 小端法：低位字节存储在内存的低地址端，高位字节存储在内存的高地址端。
+- 大端法：高位字节存储在内存的低地址端，低位字节存储在内存的高地址端。
+
+- 例子：对于16位进制数0x12345678; 在计算机中通常按bit存储，1个字节(byte)等于8个比特(bit), 所以1个16进制位需要0.5个字节保存，两个16进制位需要1个字节保存。
+所以0x12345678在内存中存储为：
+0001 0010 | 0011 0100 | 0101 0110 | 0111 1000
+按小端法存储为：(低位字节存储在内存的低地址端)
+78 56 34 12 
+按大端法存储为：(高位字节存储在内存的低地址端)
+12 34 56 78
+
+（0b是二进制，0o是八进制，0x是十六进制）
+
+2. numpy中的数据类型：
+- f       浮点型
+- c       复数浮点型
+- m       timedelta（时间间隔）
+- M       datetime（日期时间）
+- O       (Python) 对象
+- S, a    (byte-)字符串
+- U       Unicode
+- V       原始数据 (void)
+
+例如 int8, int16, int32, int64 四种数据类型可以使用字符串 'i1', 'i2','i4','i8' 代替; 
+这里的1，2，3，4指的是字节；
+
 ##### np.Ndarray的生成：
+4种生成方法：
 1. 用np.array()创建数组：
 ```python
 numpy.array(object, dtype=None, copy=True, order='K', subok=False, ndmin=0)
 ```
+- 关于order: 指定行还是列优先。
 - 关于copy：
 ```python
 import numpy as np
@@ -553,7 +1088,7 @@ print(arr4)  # 输出: [100, 2, 3]
 
 2. 初始化数组的方法： 
     2.1 生成0，1数组：
-    - np.empty(shape, dtype=float, order='C')
+    - np.empty(shape, dtype=float, order='C') #数组是元组形式传递，但也可以是列表；
     - np.zeros(shape, dtype=float, order='C')
     - np.ones(shape, fill_value, dtype=None, order='C') #shape是元组形式传递
     - np.zeros_like(a, dtype=None, order='C', subok=True, shape=None) #a是numpy数组
@@ -573,12 +1108,14 @@ print(arr4)  # 输出: [100, 2, 3]
     - np.random.randn(d0, d1, ..., dn) #生成正态分布随机数;均值为0，标准差为1；
     
     2.4 生成随机整数：
-    - np.random.randint(low, high=None, size=None, dtype=int) #low是下限，high是上限，size是元组形式传递
+    - np.random.randint(low, high=None, size=None, dtype=int) #low是下限，high是上限，size是元组形式传递；
+    - size可以是多维的；如果只输入一个数比如randint(10),10是上界，0是下界；
 
-3. 生成指定范围的数组
+3. 指定范围生成数组
 - np.arrange(start, stop, step, dtype=None)
 左闭右开；
-- 除此之外还有生成等差/等比数列的方法
+- np.linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None, axis=0)
+- np.logspace(start, stop, num=50, endpoint=True, base=10.0, dtype=None, axis=0)
 
 4. 从numpy数组直接生成数组
 `np.asarray(a, dtype=None, order=None)`与`np.array(a, dtype=None, copy=True, order=None, subok=False, ndmin=0)`：
@@ -603,6 +1140,9 @@ print(arr4)  # 输出: [100, 2, 3]
 | ndarray.shape | 数组在每个维度上的大小。对于二维数组（矩阵），表示其行数和列数。|
 | ndarray.size | 数组中元素的总个数，等于 ndarray.shape 中各个轴上大小的乘积。|
 | ndarray.dtype | 数组中元素的数据类型。|
+| ndarray.itemsize | 数组中每个元素的字节大小。|
+| ndarray.nbytes | 数组中所有元素的字节大小。|
+| ndarray.flags | 数组内存的读写模式。|
 
 
 - reshape：
@@ -633,6 +1173,88 @@ print(b)
 有两种切片方式，一种是冒号索引，一种是省略号索引；
 索引有基本的整数索引，还有整数数组索引，布尔索引，花式索引；
 
+##### 迭代数组
+函数：`np.nditer`
+返回迭代器。
+用order参数指定迭代顺序，有C和F两种，C是行优先，F是列优先；
+用op_flags参数指定每个元素的读写模式，有readonly，readwrite，writeonly，以及readwrite+triviallayout，readwrite+same_kind，readwrite+refs_ok；
+用flag参数控制
+可以进行广播迭代
+
+##### 数组操作
+###### 改变数组形状
+- `np.reshape(a, newshape, order='C')`
+- `np.flatten(a, order='C')`
+- `np.ndarray.flat`
+注： np.flatten()和np.ndarray.flat的区别：
+np.flatten()返回的是一个新数组，而np.ndarray.flat返回的是一个迭代器。
+- `np.ravel(a, order='C')`
+返回一个新的数组，该数组是原始数组的视图，因此改变返回的数组会影响原始数组。
+
+###### 翻转数组
+1. numpy.ndarry.T
+对高维数组会完全反转轴序。
+例子：
+```python
+import numpy as np
+arr = np.arrange(24).reshape(2,3,4)
+arr.T #形状为(4,3,2)
+```
+2. numpy.transpose(arr,axes)
+axes用来指定新的轴序。
+例子：
+```python
+import numpy as np
+arr = np.arrange(24).reshape(2,3,4)
+np.tranpose(arr,axes=(2,1,0)) #形状是(4,3,2)
+```
+
+3. numpy.rollaxis(arr, axis, start=0)
+调整数据轴的顺序，类似于拿扑克牌时把一张牌插到另一张牌后面。
+如果 axis 参数值大于或等于 normalized start，则 axis 从后向前滚动，直到 start 位置；如果 axis 参数值小于 normalized start，则 axis 轴从前往后滚动，直到 start 的前一个位置，即 start-1 位置
+eg 1. start>axis
+```python
+import numpy as np
+arr = np.arange(24).reshape(2,3,4)
+np.rollaxis(arr,0,2) #返回的形状是：(3,4,2)
+```
+eg 2. start < axis
+```python   
+import numpy as np
+arr = np.arange(24).reshape(2,3,4)
+np.transpose(arr,2,0) #返回的形状是：(4,2,3)
+
+```
+
+4. numpy.swapaxes(arr, axis1, axis2)
+交换两个轴
+例子：
+```python
+import numpy as np
+arr = np.arrange(24).reshape(2,3,4)
+np.swapaxes(arr,0,2) #返回的形状是：(4,3,2)
+```
+
+###### 修改数组维度
+1. numpy.broadcast(x,y):它返回一个对象，该对象封装了将一个数组广播到另一个数组的结果
+2. numpy.broadcast_to(array, shape, subok) 返回一个只读的视图；不能修改原值；
+3. numpy.expand_dims(arr, axis)：相当于torch的unsqueeze函数
+4. numpy.squeeze(arr, axis)
+
+
+###### 连接数组
+1. numpy.concatenate((a1, a2, ...), axis)：沿指定轴连接数组 
+2. np.stack((a1,a2...),axis) :会改变数组维度
+3. np.hstack和np.vstack 类似于np.concatenate的行为，不会改变数组维度；
+
+###### 分割数组
+
+###### 数组元素的添加和删除
+
+##### 关于方法的双重实现：
+reshape等方法可以通过np.reshape（）实现，也可以通过ndarray.reshape()实现。
+
+
 ##### numpy.linalg 包
 - `np.linalg.inv(a)`: 计算矩阵的逆
 - `np.linalg.eig(a)`: 计算矩阵的特征值和特征向量
@@ -650,6 +1272,30 @@ print(b)
    - where参数可以是条件表达式或与原数组形状兼容的布尔数组，否则报错；
 
 ###### where函数
+np.where(condition, x, y):如果条件满足就从x中选取元素，否则就从y中选取元素；
+例1：条件选择：
+```python
+import numpy as np
+arr = np.array([1, 2, 3, 4, 5])
+result = np.where(arr > 2, arr, 0)
+print(result)  # 输出: [0 0 3 4 5]
+```
+例2：条件查找：
+```python
+import numpy as np
+arr_2d = np.array([1,2,3],[4,5,6])
+result = np.where(arr_2d > 2)
+print(arr_2d[result] )
+```
+例3： 从多个数组里选择
+```python
+import numpy as np
+arr = np.array([1,2,3,4,5])
+x = np.array([10,20,30,40,50])
+y = np.array([100,200,300,400,500])
+result = np.where(arr>2,x,y)
+print(result)
+```
 
 ###### np.concatenate()
 ###### np.expand_dims() , np.expand()
@@ -657,8 +1303,14 @@ print(b)
 - `a`: 输入数组
 - `axis`: 插入新轴的位置
 例子：
+```python
+import numpy as np
+a = np.array([1,2,3])
+b = np.expand_dims(a, axis=0)
+print(b)
+```
 
-
+没有np.expand()函数； 没有np.unsqueeze()函数； np.expand_dims()函数可以实现unsqueeze的功能；
 
 
 ###### np.squeeze()
@@ -700,6 +1352,10 @@ print(b)
         #  [30 42]]
         ```
 
+###### np.einsum
+`np.einsum(subscripts, *operands, out=None, dtype=None, order='K', casting='safe', optimize=False)`
+
+
 
 
 
@@ -718,18 +1374,17 @@ print(b)
 4. `np.logical_and`: 按元素求交
 
 #### Pandas
-Pandas主要有两种数据结构：DataFrame和Series。
-Pandas转换为numpy： `DataFrame.values`
+Pandas主要有两种数据结构：DataFrame和Series。注意series也是有名字的。
+Pandas转换为numpy： `DataFrame.values` 或 `DataFrame.to_numpy()`
+Series转换为DataFrame: `Series.to_frame()`
 Pandas与Numpy的主要区别：
 - Pandas的索引可以有标签。
 - Pandas各列数据是异质的。Numpy数据类型是同质的。
-##### 1. `pd.read_csv`
+##### 1. `pd.read_csv`:
 ##### 2. `pd.DataFrame`：
    1. 一般用法：
    DataFrame 构造方法如下：
-   ```python
-   pandas.DataFrame(data=None, index=None, columns=None, dtype=None, copy=False)
-   ```
+    `pandas.DataFrame(data=None, index=None, columns=None, dtype=None, copy=False)`
    
    参数说明：
    - `data`：DataFrame 的数据部分
@@ -749,7 +1404,7 @@ Pandas与Numpy的主要区别：
    - `copy`：是否复制数据
        - 默认为 False，表示不复制数据
        - 如果设置为 True，则复制输入的数据
-   2. 数据框的创建：
+   2. 数据框的创建： 
        1. **从列表创建数据框：**
        ```python
        import pandas as pd
@@ -766,7 +1421,7 @@ Pandas与Numpy的主要区别：
        print(df)
        ```
 
-      1. **两种从字典创建数据框的方法**：
+       2. **两种从字典创建数据框的方法**：
        法一：
        ```python
        import pandas as pd
@@ -775,7 +1430,7 @@ Pandas与Numpy的主要区别：
        df = pd.DataFrame(data)
        print(df)
        ```  
-       法二：
+        法二：
        ```python
        import pandas as pd
 
@@ -785,7 +1440,7 @@ Pandas与Numpy的主要区别：
 
        print (df)
        ```
-       2. **从numpy数组创建数据框：**
+       3. **从numpy数组创建数据框：**
        ```python
        import pandas as pd
        import numpy as np
@@ -794,12 +1449,13 @@ Pandas与Numpy的主要区别：
        df = pd.DataFrame(data, columns=['A', 'B', 'C'])
        print(df)
        ```
-    3. **使用行/列的位置/标签索引**： `loc`/`iloc`方法： (i的意思是index)
-        1. 使用行标签返回一行或多行数据：
-        ```python
-        import pandas as pd
-        import pandas as pd
 
+ 3. **使用行/列的位置/标签索引**：`loc`/ `iloc`方法:(i的意思是index)
+        1. 使用行标签返回一行或多行数据：    
+    ```python
+        import pandas as pd
+        import pandas as pd
+        
         data = {
         "calories": [420, 380, 390],
         "duration": [50, 40, 45]
@@ -817,10 +1473,10 @@ Pandas与Numpy的主要区别：
         print(df["calories"]["day1"])
         #可以使用如下代码切片行：（区间左闭右开）
         print(df[1:3])
-        ```
+    ```
         **注意上面例子中iloc和loc的区别**
         2. 使用行索引返回一行或多行数据：
-        ```python
+    ```python
         import pandas as pd
 
         data = {
@@ -833,7 +1489,7 @@ Pandas与Numpy的主要区别：
 
         # 返回第一行和第二行
         print(df.loc[[0, 1]])
-        ```
+    ```
     4. 数据的增删改查：
     ```python
     #修改列数据：
@@ -917,7 +1573,7 @@ Pandas与Numpy的主要区别：
     - set_index(): 设置 DataFrame 的索引
     - reset_index(): 重置 DataFrame 的索引
     - transpose(): 转置 DataFrame（行列交换）
-    6. 从csv中读取和写入文件：
+    1. 从csv中读取和写入文件：
     读取：DataFrame.read_csv():
 
     | 参数 | 说明 | 默认值 |
@@ -946,7 +1602,7 @@ Pandas与Numpy的主要区别：
     | mode | 写入文件的模式，默认是 w（写模式），可以设置为 a（追加模式）| 'w' |
     | encoding | 文件的编码格式，如 utf-8，latin1 等 | None |
     
-    7. 指定每列的数据类型：(也可以在读取csv时指定)
+    2. 指定每列的数据类型：(也可以在读取csv时指定)
     ```python
     import pandas as pd
 
@@ -1006,10 +1662,11 @@ Pandas与Numpy的主要区别：
 ```python
 DataFrame.sort_values(by, axis=0, ascending=True, inplace=False)
 ```
+
 - `by`：排序依据的列名或列索引（当 `axis=0` 时），或行索引/行标签（当 `axis=1` 时）。
 - `axis`：
     - `axis=0`：对行排序，默认行为。通常基于列的值排序。
-    - `axis=1`：对列排序，通常基于索引或行的值排序。
+    - `axis=1`：对列排序，通常基于索引或行的值排序。(GPT说axis是无效参数)
 - `ascending`：是否升序排列，默认为 True。
 - `inplace`：是否直接修改原 DataFrame，默认为 False。
 
@@ -1102,7 +1759,6 @@ df.groupby("Department").agg({"Salary":["mean","sum"]})
 ```
 
 ###### **分组后排序：**
-
 ```python
 df.groupby("Department").apply(lambda x: x.sort_values("Salary"))
 ```
@@ -1197,8 +1853,8 @@ Category  Values  Mean
 
 ###### **其它：**
 1. df['column_name'].value_counts()
-返回一个Series，包含每个值出现的次数。
-value_counts() 是Series的方法。
+   返回一个 Series，包含每个值出现的次数。
+value_counts() 是 Series 的方法。
     
 ##### 5. 数据合并与连接
 1. 数据库风格的连接 — pd.merge()
@@ -1227,9 +1883,12 @@ value_counts() 是Series的方法。
     print(result)
     ```
 2. 沿轴连接 — pd.concat([DataFrame1,DataFrame2],axis=0)
-    pd.concat() 是直接用来拼接的，如果出现索引不匹配，会自动填充NaN；其它两个方法并不会自动填充，而是要指定how参数。
+    - pd.concat() 是直接用来拼接的，如果出现索引不匹配，会自动填充NaN；其它两个方法并不会自动填充，而是要指定how参数。
+    比如左边数据框是id和年龄，右边数据框是id和姓名，按行拼接时，会自动填充只有一种数据的人的另一种属性为Nan。
+    - 还可以按行拼接：
 
 3. 基于索引的连接 — DataFrame.join(DataFrame,how='left') 
+    索引是拼接列
     join() 方法是 Pandas 中的简化连接操作，通常用于基于索引将多个 DataFrame 连接。
     merge()方法是基于某列的
 
@@ -1268,7 +1927,7 @@ value_counts() 是Series的方法。
  df.applymap(lambda x: x*10 if x%2 == 0 else x) #偶数放大10倍
  ```
 
-1. Series.map(function):应用于Series的每个元素,可以是映射字典
+1. Series.map(function):应用于Series的每个元素,可以是映射字典，可以是series
  ```python
  import pandas as pd
 
@@ -1293,11 +1952,35 @@ pd.sample(n=None, frac=None, replace=False, weights=None, random_state=None, axi
 
 示例代码：
 
+###### 转化为字典：DataFrame.to_dict()
+
+```python
+#寻找一个user交互过的所有item
+user_history = pos_data.groupby('user_id').item_id.apply(list).to_dict()
+```
+
+###### DataFrame.str
+用来处理字符串。
+```python
+# 转换大小写
+df['column'].str.upper()      # 转大写
+df['column'].str.lower()      # 转小写
+df['column'].str.title()      # 首字母大写
+
+# 去除空白
+df['column'].str.strip()      # 去除两端空白
+df['column'].str.lstrip()     # 去除左侧空白
+df['column'].str.rstrip()     # 去除右侧空白
+```
+
+###### Series.unique()和Series.nunique()
+Series.unique()：返回一个包含Series中唯一值的numpy数组。
+Series.nunique()：返回一个包含Series中唯一值的计数。
 
 
-
-
-
+##### 注意事项：
+###### 1.多条件选择时用 & 和 | 连接，不要用 and 和 or。
+因为and和or是布尔运算符，而&和|是位运算符。
 
 
 
@@ -1331,6 +2014,10 @@ DataFrame.join(DataFrame,how='inner')
 
 #### torch
 ##### 张量操作：
+###### torch.flatten
+用法：`torch.flatten(input, start_dim=0, end_dim=-1) -> Tensor`
+将输入张量展平为一维。
+start_dim和end_dim是维度索引，从0开始。通常start_dim=1,从而保持batch维度。
 ###### torch.matmul 
    - matmul的全称是matrix multiplication，矩阵乘法。
    - **`torch.matmul` 的高维行为**
@@ -1504,6 +2191,10 @@ DataFrame.join(DataFrame,how='inner')
 
    希望以上解释能够帮助您理解 `torch.matmul` 在高维张量时的工作方式！
 
+###### torch.mul
+用法：`torch.mul(input, other, *, out=None) -> Tensor`
+逐元素相乘，要求两个张量形状相同。
+
 ###### torch.norm
 用法：`torch.norm(input, p=2, dim=None, keepdim=False, out=None) -> Tensor`
 计算输入张量的范数。
@@ -1549,6 +2240,75 @@ DataFrame.join(DataFrame,how='inner')
     print(y.shape)
     # 输出：torch.Size([2, 8])
     ```
+
+###### tensor.gather
+用法：`torch.gather(input, dim, index, out=None) -> Tensor`
+用于根据索引从输入张量中收集元素。
+参考：[https://blog.csdn.net/iteapoy/article/details/106203954](https://blog.csdn.net/iteapoy/article/details/106203954)
+
+###### torch.tensordot(a,b,dims=2)
+用于高维张量的收缩操作；
+- dims：
+    - 如果是整数 n，则对 a 的最后 n 个维度和 b 的前 n 个维度进行收缩
+    - 如果是两个列表/元组（如 ([a1, a2], [b1, b2])），则分别指定 a 和 b 上要收缩的维度
+
+可以指定两个tensor是哪一个维度做内积，然后循环做内积；
+只指定一个整数nn时是第一个张量的后n个维度与第二个张量的前n个维度做内积。
+
+
+###### torch.einsum()
+参考：[https://zhuanlan.zhihu.com/p/71639781](https://zhuanlan.zhihu.com/p/71639781)
+[https://blog.csdn.net/ViatorSun/article/details/122710515](https://blog.csdn.net/ViatorSun/article/details/122710515)
+
+
+
+###### tensor.permute(*dims)或函数式接口：torch.permute(tensor,dims)
+用法：`tensor.permute(*dims)`或`torch.permute(tensor,dims)`
+沿着指定的维度重新排列张量。
+
+- 关于*dims和dims的区别：
+    - 对于tensor.permute(*dims)，可以写成tensor.permute(1, 0, 2)，但不能写成：tensor.permute([1, 0, 2])
+    - 对于torch.permute(tensor,dims)，可以写成torch.permute(tensor, [1, 0, 2])，但不能写成：torch.permute(tensor, 1, 0, 2)
+
+###### tensor.view()和tensor.reshape()的区别：
+.view()要求张量连续，与原始数据共享内存，但.reshape()不要求张量连续,且不共享内存。
+尽量用reshape()就行；
+
+
+###### tensor.repeat(*sizes)
+用法：`tensor.repeat(*sizes)`
+沿着指定的维度重复张量。
+*size表示表示沿着指定维度重复的次数；
+**示例**：
+```python
+import torch
+
+# 创建一个张量
+x = torch.tensor([1, 2, 3])
+
+x.repeat(2,3) 
+#tensor([[1, 2, 3, 1, 2, 3, 1, 2, 3],
+#        [1, 2, 3, 1, 2, 3, 1, 2, 3]])
+```
+
+###### tensor.split(split_size_or_sections, dim=0)
+用法：`tensor.split(split_size_or_sections, dim=0)`
+沿着指定的维度分割张量。
+- split_size_or_sections：
+    - 如果是整数，表示每块的大小
+    - 如果是列表或元组，表示每块的具体大小
+- dim：在哪个维度上分割，默认是第0维
+
+
+###### torch.stack
+
+
+###### torch.unique 
+- 如果是三维，dims也不能输入元组，需要手动改变形状；
+- 不像numpy.unique一样有return_index参数；
+
+
+
 
 ###### Dataloader
     
@@ -1656,10 +2416,7 @@ DataFrame.join(DataFrame,how='inner')
 
 
 
-###### tensor.gather
-用法：`torch.gather(input, dim, index, out=None) -> Tensor`
-用于根据索引从输入张量中收集元素。
-参考：[https://blog.csdn.net/iteapoy/article/details/106203954](https://blog.csdn.net/iteapoy/article/details/106203954)
+
 
 ##### 关于注册参数的操作
 ###### self.register_parameter
@@ -1669,10 +2426,42 @@ DataFrame.join(DataFrame,how='inner')
 ###### self.parameters()
 用法：`self.parameters()`
 返回一个迭代器，包含所有可训练的参数。
+可以用list(self.parameters())转换为列表。
 
 ###### self.named_parameters()
 用法：`self.named_parameters()`
 返回一个迭代器，包含所有可训练的参数，并返回参数的名称。
+
+##### nn.EmbeddingBag
+nn.EmbeddingBag 是 PyTorch 中的一个层，用于处理变长序列的嵌入。它的主要特点是可以对一个"袋子"(bag)里的嵌入向量进行池化操作（如求和或平均）。
+```python
+import torch
+import torch.nn as nn
+
+class BagOfWordsModel(nn.Module):
+    def __init__(self, vocab_size, embedding_dim):
+        super().__init__()
+        self.embedding = nn.EmbeddingBag(vocab_size, embedding_dim, mode='mean')
+        self.fc = nn.Linear(embedding_dim, 2)  # 二分类
+        
+    def forward(self, text, offsets):
+        embedded = self.embedding(text, offsets)
+        return self.fc(embedded)
+
+# 使用示例
+vocab_size = 1000
+embedding_dim = 32
+model = BagOfWordsModel(vocab_size, embedding_dim)
+
+# 假设我们有两个文档，每个文档包含不同数量的词
+text = torch.tensor([1, 2, 4, 5, 4, 3, 2, 9])  # 所有文档的词索引连接在一起
+offsets = torch.tensor([0, 4])  # 第一个文档从索引0开始，第二个从索引4开始
+
+# 前向传播
+output = model(text, offsets)
+print(output.shape)  # torch.Size([2, 2])
+```
+
 
 ##### 关于model的操作
 ###### nn.sequential和nn.ModuleList
@@ -1763,6 +2552,125 @@ model_dict = nn.ModuleDict({
 # 访问
 output1 = model_dict['linear1'](input)
 ```
+###### self.modules()
+返回一个迭代器，包含所有子模块。
+例如：
+```python
+import torch.nn as nn
+
+class MyModel(nn.Module):
+    def __init__(self):
+        super(MyModel, self).__init__()
+        self.conv1 = nn.Conv2d(1, 32, 3)
+        self.relu = nn.ReLU()
+        self.fc = nn.Linear(32 * 26 * 26, 10)
+
+    def forward(self, x):
+        return self.fc(self.relu(self.conv1(x)).view(x.size(0), -1))
+
+model = MyModel()
+
+# 遍历所有模块
+for m in model.modules():
+    print(m)
+
+```
+会输出 MyModel、Conv2d、ReLU、Linear 四个模块。
+
+
+
+##### 关于梯度的操作
+###### tensor.retain_grad()
+在 PyTorch 中，只有叶子节点的张量（leaf tensor）默认会保留梯度，非叶子张量的 .grad 属性在反向传播后是 None，如果你想获取它们的梯度，就要用 .retain_grad()。
+
+###### tensor.requires_grad
+
+###### loss.backward()的参数：
+默认为torch.ones_like(loss);
+其它情况：
+```python
+import torch
+
+# 创建一个简单的计算图
+x = torch.tensor([1.0, 2.0, 3.0], requires_grad=True)
+y = x * 2  # y = [2.0, 4.0, 6.0]
+
+# 情况1: 使用全1梯度
+y.backward(torch.ones_like(y))
+print("情况1 - 全1梯度:", x.grad)  # 输出: tensor([2., 2., 2.])
+x.grad.zero_()  # 清除梯度
+
+# 情况2: 使用不同的权重
+y.backward(torch.tensor([1.0, 2.0, 3.0]))
+print("情况2 - 不同权重:", x.grad)  # 输出: tensor([2., 4., 6.])
+x.grad.zero_()
+
+# 情况3: 使用负值
+y.backward(torch.tensor([-1.0, -1.0, -1.0]))
+print("情况3 - 负梯度:", x.grad)  # 输出: tensor([-2., -2., -2.])
+x.grad.zero_()
+
+# 情况4: 使用零值
+y.backward(torch.tensor([0.0, 0.0, 0.0]))
+print("情况4 - 零梯度:", x.grad)  # 输出: tensor([0., 0., 0.])
+```
+情况1：每个输出元素对梯度的贡献相等，所以每个输入元素的梯度都是2（因为 y = x * 2）
+情况2：第二个和第三个输出元素对梯度的贡献更大，所以它们的梯度也更大
+情况3：梯度方向相反，表示我们想要最小化而不是最大化输出
+情况4：没有梯度传播，因为所有输出元素的权重都是0
+
+##### 关于torch.autograd.Function
+- 通过两个静态方法：forward和backward函数自定义forward和backward过程;
+- 有上下文管理对象ctx;
+- backward的参数：
+  ```python
+  backward(ctx, *grad_outputs)
+  ```
+  - 参数：
+    - ctx: 上下文对象，从 ctx.saved_tensors 中获取在 forward 里保存的中间变量
+    - *grad_outputs: 输出对 loss 的梯度（∂L/∂output），也叫"上游梯度"。如果 forward 返回多个输出，这里就会有多个 grad
+  - 返回值：
+    - 返回每个 forward 输入的梯度（∂L/∂input）
+    - 如果某个输入不需要梯度，可以返回 None
+例子：
+```python
+import torch
+from torch.autograd import Function
+
+class ScaleFunction(Function):
+    @staticmethod
+    def forward(ctx, x, scale_factor):
+        # 保存scale_factor用于反向传播
+        ctx.save_for_backward(scale_factor)
+        # 前向传播：将输入乘以缩放因子
+        return x * scale_factor
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        # 获取保存的scale_factor
+        scale_factor, = ctx.saved_tensors
+        # 反向传播：梯度乘以缩放因子
+        return grad_output * scale_factor, None
+
+# 使用示例
+def test_scale_function():
+    # 创建输入张量
+    x = torch.tensor([1.0, 2.0, 3.0], requires_grad=True)
+    scale_factor = torch.tensor(2.0)
+    
+    # 使用自定义函数
+    y = ScaleFunction.apply(x, scale_factor)
+    
+    # 计算梯度
+    y.sum().backward()
+    
+    print("输入:", x)
+    print("输出:", y)
+    print("输入梯度:", x.grad)  # 应该看到梯度都是2.0
+
+# 运行测试
+test_scale_function()
+```
 
 
 #### scikit-learn (keras)
@@ -1787,8 +2695,194 @@ output1 = model_dict['linear1'](input)
 - `history | grep <关键词>`
 - 查看帮助：`info ls` 或 `ls --help`
 - `cat 文件`: 打开文件
+##### 如果终端窗口不够长，如何查看历史输出
+如果您是在普通终端中：
+使用鼠标滚轮向上滚动
+或使用 Shift+PageUp 向上滚动
+如果您在使用screen：
+按 Ctrl+a 然后按 [ 键进入滚动模式
+使用方向键或PageUp/PageDown键滚动
+按 Esc 键退出滚动模式
+如果您在使用tmux：
+按 Ctrl+b 然后按 [ 键进入复制模式
+使用方向键或PageUp/PageDown键滚动
+按 q 键退出复制模式
+根据您的终端提示，您可能正在使用screen，试试第二种方法。
 
-#### git 命令
+### C++ 笔记
+#### typedef
+typedef 是 C/C++ 中用于给已有类型起别名的关键字； 更推荐使用using;
+给普通类型起别名，如：
+```cpp
+typedef int my_int;
+my_int a = 10;
+```
+给函数指针起别名，如：
+```cpp
+typedef int (*func_ptr)(int, int);
+func_ptr add = [](int a, int b) -> int { return a + b; };
+```
+
+#### 匿名函数
+```cpp
+[capture](parameter_list) -> return_type { function_body }
+```
+- capture: 捕获列表，可以捕获外部变量
+- parameter_list: 参数列表
+- return_type: 返回类型
+- function_body: 函数体
+
+例子：
+```cpp
+int x = 100;
+auto add = [x](int a) -> int { return a + x; };
+add(10);
+```
+#### void的用法：
+1. 函数返回类型	void func()	表示这个函数没有返回值
+2. 指针类型	void *ptr	表示这是一个"不定类型"的指针，可以指向任何类型
+
+#### 模板库：
+C++ 标准模板库（STL）：
+C++ 标准模板库（STL：Standard Template Library）是 C++ 最重要的模板库之一。
+
+STL 包含：
+| 组件 | 说明 | 示例 |
+|------|------|------|
+| 容器 | Containers | vector, list, map, set |
+| 算法 | Algorithms | sort, find, copy, accumulate |
+| 迭代器 | Iterators | begin(), end(), 自定义迭代器 |
+
+一个例子：
+```cpp
+#include <vector>
+#include <algorithm>
+#include <iostream>
+
+int main() {
+    std::vector<int> v = {3, 1, 4, 1, 5};
+    std::sort(v.begin(), v.end());
+    for (int i : v) std::cout << i << " ";  // 输出 1 1 3 4 5
+}
+```
+
+#### vector的用法：
+定义：
+```cpp
+std::vector<int> v={1,2,3,4,5};
+```
+常用方法：
+- `v.push_back(x)`: 在末尾添加元素
+- `v.size()`: 返回元素个数
+- `v[10]`: 访问第10个元素
+- 循环：
+```cpp
+for (int i : v) std::cout << i << " ";
+```
+
+#### set的用法：
+用于存储不重复的元素，并且这些元素会自动按照升序排序，只读元素：不能直接修改某个元素的值。
+```cpp
+std::set<int> s = {1,2,3,4,5};
+```
+常用方法：
+- `insert(val)`: 插入元素
+- `erase(val)`: 删除元素
+- `find(val)`: 查找元素，返回迭代器
+- `count(val)`: 返回元素出现次数，由于是set，所以返回值只能是0或1
+- `size()`: 返回元素数量
+- `clear()`: 清空集合
+- `begin()/end()`: 返回迭代器
+- `empty()`: 判断集合是否为空
+
+#### unordered_set的用法：
+用于存储不重复的元素，但是这些元素不会自动按照升序排序。
+```cpp
+std::unordered_set<int> s = {1,2,3,4,5};
+```
+常用方法：
+- `insert(val)`: 插入元素
+- `erase(val)`: 删除元素
+- `find(val)`: 查找元素，返回迭代器
+- `count(val)`: 返回元素出现次数，由于是unordered_set，所以返回值只能是0或1
+- `size()`: 返回元素数量
+- `clear()`: 清空集合
+- `begin()/end()`: 返回迭代器
+- 循环：
+```cpp
+for (auto x : us) std::cout << x << " ";
+```
+
+### git 命令
+#### git status
+1. 一个例子：本地仓库落后远程仓库1个commit，且工作区有修改。
+```bash
+PS A:\coding\learn_git> git status
+On branch main
+Your branch is behind 'origin/main' by 1 commit, and can be fast-forwarded.
+  (use "git pull" to update your local branch)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   hello_world.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+最后一行由于没有stage的内容，所以也就没有可以commit的内容.
+2. 一个例子：
+```bash
+git status
+On branch main
+Your branch and 'origin/main' have diverged,
+and have 1 and 1 different commits each, respectively.
+  (use "git pull" to merge the remote branch into yours) ##### 您的本地分支有 1 个远程没有的提交，远程分支有 1 个您本地没有的提交，两个分支"分歧"了
+
+You have unmerged paths. # 有未解决冲突
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+        both modified:   hello_world.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+#### git diff 相关
+- git diff 查看工作区与暂存区差异
+- git diff --cached(或--staged) 查看暂存区与最近提交差异
+- git diff HEAD 查看工作区与最近提交差异
+- git diff <file> 查看工作区与暂存区差异
+- git diff --cached <file> 查看暂存区与最近提交差异
+- git diff HEAD <file> 查看工作区与最近提交差异
+- git diff <commit1> <commit2> 查看两个提交之间的差异
+- git diff <commit> <file> 查看某个提交与某个文件的差异
+
+git diff 的输出：统一差异格式（unified diff):
+一个例子：
+```bash
+diff --git a/example.txt b/example.txt ##### a表示左侧，b表示右侧
+index 3b18e72..a5f9c1e 100644
+--- a/example.txt
++++ b/example.txt
+@@ -1,4 +1,5 @@ ###### 表示旧版本的1到4行，新版本的1到5行；
+-Hello, world!  #### -表示旧版本有，新版本无
+ This is a demo file. ### 没符号表示没变化
++We have added this new line. ### +表示新版本有，旧版本无
+ And this line remains unchanged.
++Another addition here.
+```
+
+#### git stash 相关：
+- `git stash list`: 
+- `git stash pop [<stash>@{<idx>}] [--index]`: 将指定（默认是最新的）stash 条目中的改动重新应用到当前工作区和暂存区
+- `git stash`: 
+- `git stash push --staged`:只保留暂存区内容；
+- `git stash push file`: stash某文件；
+-  
+
+
+#### 其它
 - git的user.name和user.email设置：
 `git config --global user.name "your_name"`
 `git config --global user.email "your_email@example.com"`
@@ -1826,13 +2920,76 @@ output1 = model_dict['linear1'](input)
 
 问题：git 比对版本的时候会不会丢失之前工作？
 
-#### Some technique
-1. `non_zero_mask = a > 0`: 获得为正的 index
-2. `perf = -1`: 有些函数会返回 -1
+#### 一些编程思想
+##### 向量化思想
+从数据框里取数，不要一行一行的取，而是把index组成numpy，一下子取出来，这样速度快。
 
+
+### github 网站教程
+#### review a pull request
+Reviewing a pull request is an opportunity to examine another contributor's changes and give them feedback.
+
+
+
+
+### Conda环境
+#### 小知识
+##### Linux中conda环境位置：
+`/home/用户名/.Conda `
+##### 包的位置：
+`/home/用户名/.Conda/envs/环境名/lib/python3.10/site-packages`
+##### nltk下载文件的位置：
+`~/.nltk_data`
+##### .conda/pkgs 内容：
+在 .conda/pkgs 目录下，conda 会存储你安装的所有包的缓存文件。
 
 
 ### Linux:
+#### 使用乌邦图的常识：
+##### 命令行窗口使用crtl+shift+C和ctrl+shift+V进行粘贴复制；
+##### 右键没有新建文件的问题： 
+GNOME 桌面环境（如 Ubuntu 默认桌面）中常见的问题：默认没有“右键新建文档”选项。GNOME 的右键菜单“新建文档”功能，是基于一个 模板文件夹（Templates） 来显示的。如果 ~/Templates 目录中没有文件，右键菜单就不会显示“新建文档”。 使用如下：
+```bash
+mkdir -p ~/Templates
+touch ~/Templates/Empty\ Document.txt
+```
+之后就有了；
+
+
+#### shell与bash:
+- Shell（壳）
+Shell 是一个程序，它提供了一个用户与操作系统（如 Linux、Unix）进行交互的界面。就像它的名字"壳"一样，它是包裹在操作系统核心（kernel）外面的一层。
+- bash: 是 Linux 系统默认的 shell 程序，它提供了丰富的命令行功能和脚本编程能力。
+
+#### 超级用户(root)
+登录后可以用su命令切换到超级用户；
+su - username 切换到指定用户；
+sudo 以超级用户权限执行命令；
+
+#### 用户组
+groups 查看当前用户所属组
+（每个用户都有一个同名主组）
+示例：
+```Shell
+$ groups
+zhi-li adm cdrom sudo dip plugdev users lpadmin
+# 显示当前用户 zhi-li 属于多个用户组:
+# - zhi-li (主组)
+# - adm
+# - cdrom 
+# - sudo
+# - dip
+# - plugdev
+# - users
+# - lpadmin
+```
+
+#### 文件属性
+- ls -l 查看文件属性
+  - 显示出来的第一行total表示当前目录下所有文件和子目录所占用的磁盘块（block）总数 但不计算子目录内文件占用磁盘数量
+  - 其余内容包括文件类型、权限、硬链接数、所属用户、所属组、文件大小、修改时间、文件名
+
+
 #### source 的主要用途
 加载环境变量
 
@@ -1865,14 +3022,40 @@ output1 = model_dict['linear1'](input)
 | 变量保留 | 是 | 否 |
 | 适用场景 | 修改当前Shell环境 | 独立执行脚本 |
 
-1. /opt和/usr区别：
-/usr中文件可以直接在命令行运行
-2. 桌面图标的位置：
+
+#### /opt和/usr区别：
+/usr 是系统标准软件的"共享仓库"，而 /opt 是"外来的大软件"专属地盘。
+
+/usr vs /opt 对比表：
+| 特性 | /usr | /opt |
+|------|------|------|
+| 用途 | 系统自带 & 标准包管理器安装的软件（如 APT 安装的） | 外部提供的独立大软件（通常是第三方预编译包） |
+| 结构 | 拥有多个子目录，如 /usr/bin, /usr/lib, /usr/share 等 | 每个软件一个子目录，如 /opt/google/chrome/ |
+| 管理方式 | 通常由包管理器（如 apt、dpkg）管理 | 通常是用户手动解压或安装的 |
+| 设计目标 | 提供给所有用户共享的软件库和工具 | 容纳"非标准"、自包含、不会影响系统的独立应用 |
+| 示例 | /usr/bin/vim, /usr/lib/libc.so.6 | /opt/pycharm, /opt/Matlab, /opt/Google/chrome |
+#### 桌面图标的位置：
 `/usr/share/applications/`
-3. `/bin`和`/usr/bin`和`/usr/local/bin`的区别：
-- `/bin`：系统命令，通常是系统自带的命令，如 `ls`, `cp`, `mv` 等。
-- `/usr/bin`：用户命令，通常是系统自带的命令，如 `ls`, `cp`, `mv` 等。
-- `/usr/local/bin`：用户命令，通常是用户安装的命令，如 `conda`, `pip` 等。
+#### `/bin`和`/usr/bin`和`/usr/local/bin`的区别：
+- `/bin`：存放的是系统启动和运行最基本的可执行程序，在系统尚未挂载 /usr、网络不可用、图形界面没启动之前，系统就必须能执行这些命令；，如 `ls`, `cp`, `mv`,`rm` 等。
+- `/usr/bin`：/usr/bin 是 Linux 中用于存放非基本命令的用户级可执行程序（binary executables）的目录，如 `ssh`,`vim`,`code`(VScode) 等。
+- `/usr/local/bin`：/usr/local 是为“本地手动安装的软件”预留的目录，用于区别于系统软件包管理器（如 apt、yum）自动安装的软件。
+自定义安装的是指：解压 .tar.gz 到某路径，下载 .AppImage、.run、.sh 安装脚本， 通过./configure && make && sudo make install 安装。
+### 编译安装和独立软件仓
+- 编译安装：./configure && make && sudo make install
+#### 关于文件结构
+🧱 /bin, /lib, /sbin: 系统核心组件
+
+👨 /home, /root: 用户家目录
+
+⚙️ /etc: 配置大本营
+
+🧪 /proc, /sys: 内核接口
+
+🧳 /opt, /usr, /var: 应用和数据的集合区
+
+⛺ /tmp, /mnt, /media: 临时或挂载区
+
 
 ### Mysql
 1. 几个英文句子的含义：
@@ -1908,6 +3091,7 @@ Compresser
     - 解决方案：禁用 `markdown-math` 扩展，使用 `@builtin markdown` 禁用。
 3. enable editor preview单击打开文件后无法出现在bar中。
 4. activate bar是最左侧一栏
+5. vscode 下 git diff 视图：左边是历史，右边是当前的
 ### 网络相关：
 #### `netstat -ano` 命令
 `netstat -ano` 是一个 Windows 命令，用于显示网络连接、路由表、网络接口统计信息以及网络协议的详细信息。以下是该命令的输出解释：
@@ -1967,7 +3151,7 @@ HTTP（HyperText Transfer Protocol）和 HTTPS（HyperText Transfer Protocol Sec
     - **HTTPS**：搜索引擎（如 Google）更倾向于对 HTTPS 网站进行更高的排名。
 
     1. **浏览器支持**：
-    - **HTTP**：现代浏览器会标记 HTTP 网站为“不安全”。
+    - **HTTP**：现代浏览器会标记 HTTP 网站为"不安全"。
     - **HTTPS**：现代浏览器会显示安全锁图标，表示网站是安全的。
 
     总结：
@@ -2070,3 +3254,115 @@ def train(epochs=20, batchSize=1024, lr=0.01, lamda=0.1, factors_dim=64):
 - Byte string: 主要支持 ASCII 字符（0-127） Unicode: 支持所有字符（包括中文、日文、emoji等）
 
 ##### ssh的公钥放在服务器的~/.ssh/authorized_keys文件中
+
+##### 前端与后端
+###### 前端（Frontend）
+1. 定义: 前端是用户直接交互的部分，通常称为客户端。它包括网页的视觉部分和用户体验。
+2. 技术栈:
+HTML (HyperText Markup Language): 用于创建网页的结构。
+CSS (Cascading Style Sheets): 用于设计和布局网页的外观。
+JavaScript: 用于实现网页的动态功能和交互。
+3. 框架和库:
+React: 一个用于构建用户界面的JavaScript库。
+Angular: 一个由Google开发的前端框架。
+Vue.js: 一个渐进式JavaScript框架。
+4. 职责:
+设计和实现用户界面。
+确保网页在不同设备和浏览器上的兼容性。
+提供良好的用户体验和交互。
+###### 后端（Backend）
+1. 定义: 后端是支持前端的服务器端部分，负责数据处理、业务逻辑和数据库管理。
+2. 技术栈:
+服务器端语言: 如Python, Java, Ruby, PHP, Node.js。
+数据库: 如MySQL, PostgreSQL, MongoDB。
+服务器: 如Apache, Nginx。
+
+3. 框架:
+Django: 一个Python的Web框架。
+Spring: 一个Java的Web框架。
+Express.js: 一个Node.js的Web框架。
+4. 职责:
+处理来自前端的请求。
+管理和操作数据库。
+实现应用程序的业务逻辑。
+确保数据的安全性和完整性。
+###### 交互
+API (Application Programming Interface): 前端和后端通过API进行通信。API定义了前端如何请求数据以及后端如何响应这些请求。
+
+##### 技术栈
+技术栈（Tech Stack）是指在软件开发中使用的一组技术、工具和框架的集合。它包括用于构建应用程序的所有技术层，从前端到后端，再到数据库和服务器。技术栈通常分为以下几个主要部分
+
+##### Tab的含义
+"Tab" 在计算机领域有多个含义，具体要看上下文。常见的几种意思如下：
+
+制表符（Tab Key）：键盘上的 Tab 键，通常用于在文本编辑器或代码编辑器中插入制表符（\t），或者在表单和界面元素之间切换。
+
+e.g. Press Tab to indent the code.（按 Tab 键缩进代码。）
+浏览器标签页（Browser Tab）：网页浏览器（如 Chrome、Firefox）中的标签页，每个 Tab 代表一个打开的网页。
+
+e.g. I have too many tabs open in my browser.（我的浏览器打开了太多标签页。）
+软件界面中的选项卡（UI Tab）：许多应用程序（如 Excel、VS Code）都使用 Tab 来组织不同的页面或功能。
+
+e.g. Switch to the "Home" tab in Excel.（切换到 Excel 的"主页"选项卡。）
+代码缩进方式（Tab vs. Space）：在编程中，Tab 也可以指用 制表符（Tab） 进行缩进，而不是使用空格（Space）。不同项目可能有不同的代码风格。
+
+e.g. Some programmers prefer tabs over spaces for indentation.（有些程序员喜欢用 Tab 代替空格进行缩进。）
+
+##### icon和buttom的区别
+Icon 和 Button 是两种常见的 UI (用户界面) 元素，它们在功能和外观上有所不同。以下是它们之间的主要区别：
+
+Icon (图标)
+定义：图标通常是一个小的、简洁的 图形，用于表示某种功能、操作或内容。图标通常不包含文字，依靠视觉元素（例如图形或符号）来传达信息。
+
+功能：图标本身通常是 点击或触摸的目标，但它并不总是作为“按钮”来使用。有时图标只是用作表示某些功能的视觉元素。
+
+外观：图标通常较小，简洁，形状多样（如圆形、方形、符号等）。
+
+例子：例如，在大多数应用程序中，放大镜图标表示搜索，信封图标表示邮件，齿轮图标表示设置。
+
+Button (按钮)
+定义：按钮是一种交互式元素，通常包含 文字、图标或两者结合，并且明确表示用户可以 点击它来执行某个操作。按钮通常具有较大的可点击区域，易于识别。
+
+功能：按钮通常用于触发某些操作，比如提交表单、切换页面或触发事件。按钮上的文字或图标会明确告诉用户这个按钮的用途。
+
+外观：按钮通常比图标大，并且会有 可视化的变化（如背景颜色变化或浮动效果），以明确告诉用户它是一个交互式元素。
+
+例子：例如，页面上的“提交”按钮、社交媒体应用中的“点赞”按钮、或网站上的“注册”按钮
+
+##### 语法糖
+语法糖（Syntactic Sugar）是指在编程语言中，通过提供一些更简洁、更易读的语法形式，使得程序员可以更方便地书写代码。这种语法的变化并不会改变程序的功能或逻辑，只是让代码更直观、简洁、易懂
+比如
+- 列表推导式：
+```python
+result = []
+for i in range(10):
+    if i % 2 == 0:
+        result.append(i)
+print(result)
+```
+可以简化为：
+```python
+result = [i for i in range(10) if i % 2 == 0]
+```
+- 装饰器：
+```python
+def decorator(func):
+    def wrapper(*args, **kwargs):
+        print("Before function call")
+        result = func(*args, **kwargs)
+        print("After function call")
+        return result
+    return wrapper
+
+def say_hello(name):
+    print(f"Hello, {name}!")
+
+say_hello = decorator(say_hello)  # 手动应用装饰器
+say_hello("Alice")
+```
+可以简化为：
+```python
+@decorator
+def say_hello(name):
+    print(f"Hello, {name}!")
+```
