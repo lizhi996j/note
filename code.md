@@ -3092,6 +3092,24 @@ Compresser
 3. enable editor preview单击打开文件后无法出现在bar中。
 4. activate bar是最左侧一栏
 5. vscode 下 git diff 视图：左边是历史，右边是当前的
+6. 多行光标：
+✅ 在 VS Code 中选中 某单词 批量编辑：
+方法一：使用 Ctrl + D（或 Cmd + D on Mac）
+将光标放在第一个 某单词 上。
+
+连续按 Ctrl + D（Mac 是 Cmd + D）可以逐个选中下一个相同的单词。
+
+多个光标出现后即可同步修改。
+
+方法二：Ctrl + Shift + L（或 Cmd + Shift + L）
+用鼠标或键盘选中一次 某单词。
+
+然后按 Ctrl + Shift + L（Mac 是 Cmd + Shift + L）。
+
+所有相同的文本会被添加为多光标，一起编辑。
+
+方法三：Alt + Click 添加光标到每一行
+如果 某单词 分布位置不同，可使用 Alt + Click 手动在每一行上添加光标。
 ### 网络相关：
 #### `netstat -ano` 命令
 `netstat -ano` 是一个 Windows 命令，用于显示网络连接、路由表、网络接口统计信息以及网络协议的详细信息。以下是该命令的输出解释：
