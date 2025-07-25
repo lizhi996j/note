@@ -2849,6 +2849,7 @@ Unmerged paths:
 no changes added to commit (use "git add" and/or "git commit -a")
 ```
 #### git pull = git fetch + git merge
+拉取远程新提交，当远程没有新提交时无法拉取；
 
 #### git ls-files 相关
 git ls-files 是一个 Git 命令，用来列出当前 Git 仓库中被 Git 跟踪的所有文件。它会显示已添加到 Git 索引（暂存区）的文件
@@ -2940,6 +2941,7 @@ index 3b18e72..a5f9c1e 100644
 
 #### 疑问
 1. 如果给远程推送的时候有覆写，会不会推送成功？
+取决于是不是fast forward, 如果一个分支只有另一个分支的历史提交，就会fast forward从而覆写；
 
 ### github 网站教程
 #### review a pull request
