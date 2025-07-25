@@ -2848,6 +2848,11 @@ Unmerged paths:
 
 no changes added to commit (use "git add" and/or "git commit -a")
 ```
+#### git pull = git fetch + git merge
+
+#### git ls-files 相关
+git ls-files 是一个 Git 命令，用来列出当前 Git 仓库中被 Git 跟踪的所有文件。它会显示已添加到 Git 索引（暂存区）的文件
+
 #### git diff 相关
 - git diff 查看工作区与暂存区差异
 - git diff --cached(或--staged) 查看暂存区与最近提交差异
@@ -2881,6 +2886,19 @@ index 3b18e72..a5f9c1e 100644
 - `git stash push file`: stash某文件；
 -  
 
+#### git checkout 相关
+- `git checkout -- <file>`: 还原暂存区版本；
+- `git checkout HEAD --<file>`: 还原到最后一次提交，
+- `git checkout <branch>`: 切换分支
+- `git checkout <commit-id> -- <file-name>`: 将文件还原到指定版本的内容;会同时写入工作区和暂存区；
+
+#### git reset 相关
+- git reset <file>: 将指定文件从暂存区移除，但保留工作区的修改内容。
+
+#### git restore
+用来替代git checkout和git reset
+如果文件被暂存，git restore --staged <file>: 将指定文件从暂存区移除，但保留工作区的修改内容。
+如果文件未被暂存，git restore <file>: 会还原成暂存区版本；
 
 #### 其它
 - git的user.name和user.email设置：
@@ -2920,14 +2938,19 @@ index 3b18e72..a5f9c1e 100644
 
 问题：git 比对版本的时候会不会丢失之前工作？
 
+#### 疑问
+1. 如果给远程推送的时候有覆写，会不会推送成功？
+
+### github 网站教程
+#### review a pull request
+Reviewing a pull request is an opportunity to examine another contributor's changes and give them feedback.
+
 #### 一些编程思想
 ##### 向量化思想
 从数据框里取数，不要一行一行的取，而是把index组成numpy，一下子取出来，这样速度快。
 
 
-### github 网站教程
-#### review a pull request
-Reviewing a pull request is an opportunity to examine another contributor's changes and give them feedback.
+
 
 
 
