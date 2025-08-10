@@ -1,2 +1,1 @@
-{"name": "Alice", "age": 25, "is_student": false, "scores": [95, 88, 92]}
-{"name": "Bob", "age": 30, "is_student": true, "scores": [85, 90, 88]}
+[{"name": "Alice", "age": 25, "is_student": false, "scores": [95, 88, 92]},{"name": "Bob", "age": 30, "is_student": true, "scores": [85, 90, 88]}]
