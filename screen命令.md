@@ -9,5 +9,6 @@ screen -S pts-6.Ubuntu -X quit
 ```
 -S 指定会话，-X 指定命令
 方法2：批量删除多个 screen 会话
+screen -ls | grep Detached | cut -d. -f1 | awk '{print $1}' | xargs -I {} screen -S {} -X quit
 方法3：删除所有 detached 的 screen 会话
 方法4：进入screen会话后删除

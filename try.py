@@ -1,1 +1,2 @@
-import np
+import sys
+print(sys.modules)
