@@ -40,3 +40,7 @@ conda create -n newname -f myenv.txt
 2. 传递参数时长参数和短参数(-f和--file)有时等价，有时不等价;比如conda env create -f myenv.yaml和conda env create --file myenv.yaml等价，但conda create -f myenv.txt和conda env create --file myenv.txt不等价。
 3. **推荐用yaml文件创建**，包列表如何包含pip的包，可能报错；
 
+### 在本地复制环境
+```bash
+conda create --name new_env_name --clone old_env_name
+```
